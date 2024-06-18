@@ -3,6 +3,7 @@ package project.springboot.template.service;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import project.springboot.template.dto.request.CreateJobRequest;
+import project.springboot.template.dto.request.UpdateJobRequest;
 import project.springboot.template.dto.response.JobDetailResponse;
 import project.springboot.template.dto.response.JobResponse;
 import project.springboot.template.entity.Job;
@@ -73,7 +74,7 @@ public class JobService {
     public JobDetailResponse getHiringDetailJob(Long id) {
         Job hiringJob = jobRepository.findJobByIdAndStatus(id, true)
                 .orElseThrow(() -> ApiException.create(HttpStatus.BAD_REQUEST).withMessage("Không tìm thấy job:" + id));
-        if(hiringJob.isStatus()== false){
+        if (hiringJob.isStatus() == false) {
             throw ApiException.create(HttpStatus.BAD_REQUEST).withMessage("Công việc không khả dụng");
         }
         JobDetailResponse jobResponse = ObjectUtil.copyProperties(hiringJob, new JobDetailResponse(), JobDetailResponse.class, true);
@@ -95,5 +96,48 @@ public class JobService {
             return Collections.emptyList();
         }
         return Arrays.asList(keyword.split("-"));
+    }
+
+    public JobResponse changeJobStatus(Long id, boolean status) {
+        Job job = this.jobRepository.findById(id)
+                .orElseThrow(() -> ApiException.create(HttpStatus.BAD_REQUEST).withMessage("Không tìm thấy công việc:" + id));
+        job.setStatus(status);
+        this.jobRepository.save(job);
+        return ObjectUtil.copyProperties(job, new JobResponse(), JobResponse.class, true);
+    }
+
+    public JobDetailResponse updateJob(Long id, UpdateJobRequest updateJobRequest) {
+        Job updatedJob = this.jobRepository.findById(id)
+                .orElseThrow(() -> ApiException.create(HttpStatus.BAD_REQUEST).withMessage("Không tìm thấy công việc:" + id));
+
+        updatedJob.setDepartment(updateJobRequest.getDepartment());
+        updatedJob.setEndDate(updateJobRequest.getEndDate());
+        updatedJob.setDescription(updateJobRequest.getDescription());
+        updatedJob.setTitle(updateJobRequest.getTitle());
+        updatedJob.setPosition(updateJobRequest.getPosition());
+        updatedJob.setTargetNumber(updateJobRequest.getTargetNumber());
+        updatedJob.setSalaryRangeTo(updateJobRequest.getSalaryRangeTo());
+        updatedJob.setSalaryRangeFrom(updateJobRequest.getSalaryRangeFrom());
+        updatedJob.setStatus(updateJobRequest.isStatus());
+        updatedJob.setRequiredExperience(updateJobRequest.getRequiredExperience());
+
+        if (!updateJobRequest.getKeywords().isEmpty()) {
+            String keyworkAsString = String.join("-", updateJobRequest.getKeywords());
+            updatedJob.setKeywords(keyworkAsString);
+        }
+        Job savedJob = jobRepository.save(updatedJob);
+        return ObjectUtil.copyProperties(savedJob, new JobDetailResponse(), JobDetailResponse.class, true);
+    }
+
+    public Boolean deleteJob(Long id) {
+        try {
+            Job job = this.jobRepository.findById(id)
+                    .orElseThrow(() -> ApiException.create(HttpStatus.BAD_REQUEST).withMessage("Không tìm thấy công việc:" + id));
+            this.jobRepository.delete(job);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 }

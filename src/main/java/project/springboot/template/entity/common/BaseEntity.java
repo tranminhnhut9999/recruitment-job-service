@@ -19,7 +19,6 @@ import java.time.Instant;
 @Audited
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-@Data
 @EqualsAndHashCode(callSuper = false)
 public class BaseEntity implements Serializable {
 
@@ -38,4 +37,36 @@ public class BaseEntity implements Serializable {
     @Column(name = "last_modified_by")
     @LastModifiedBy
     private String lastModifiedBy;
+
+    public Instant getCreated() {
+        return created;
+    }
+
+    public void setCreated(Instant created) {
+        this.created = created;
+    }
+
+    public Instant getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(Instant lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
 }
