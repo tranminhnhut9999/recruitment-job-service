@@ -73,6 +73,9 @@ public class JobService {
     public JobDetailResponse getHiringDetailJob(Long id) {
         Job hiringJob = jobRepository.findJobByIdAndStatus(id, true)
                 .orElseThrow(() -> ApiException.create(HttpStatus.BAD_REQUEST).withMessage("Không tìm thấy job:" + id));
+        if(hiringJob.isStatus()== false){
+            throw ApiException.create(HttpStatus.BAD_REQUEST).withMessage("Công việc không khả dụng");
+        }
         JobDetailResponse jobResponse = ObjectUtil.copyProperties(hiringJob, new JobDetailResponse(), JobDetailResponse.class, true);
         jobResponse.setKeywords(this.extractKeyword(hiringJob.getKeywords()));
         return jobResponse;
