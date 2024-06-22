@@ -12,9 +12,7 @@ import project.springboot.template.repository.JobRepository;
 import project.springboot.template.util.ObjectUtil;
 
 import javax.transaction.Transactional;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,20 +25,27 @@ public class JobService {
     }
 
     public JobDetailResponse createJob(CreateJobRequest createJobRequest) {
-        Job.JobBuilder jobBuilder = Job.builder().department(createJobRequest.getDepartment())
+        Job.JobBuilder jobBuilder = Job.builder()
+                .department(createJobRequest.getDepartment())
                 .endDate(createJobRequest.getEndDate())
+                .startDate(createJobRequest.getStartDate())
                 .description(createJobRequest.getDescription())
                 .title(createJobRequest.getTitle())
-                .position(createJobRequest.getPosition())
                 .targetNumber(createJobRequest.getTargetNumber())
                 .salaryRangeTo(createJobRequest.getSalaryRangeTo())
                 .salaryRangeFrom(createJobRequest.getSalaryRangeFrom())
                 .status(createJobRequest.isStatus())
-                .requiredExperience(createJobRequest.getRequiredExperience());
+                .requiredExperience(createJobRequest.getRequiredExperience())
+                .jobType(createJobRequest.getJobType())
+                .workingPlace(createJobRequest.getWorkingPlace());
 
         if (!createJobRequest.getKeywords().isEmpty()) {
             String keyworkAsString = String.join("-", createJobRequest.getKeywords());
             jobBuilder.keywords(keyworkAsString);
+        }
+        if (!createJobRequest.getRecruiters().isEmpty()) {
+            String recruiterAsString = String.join("-", createJobRequest.getRecruiters());
+            jobBuilder.recruiters(recruiterAsString);
         }
         Job job = jobBuilder.build();
         Job savedJob = jobRepository.save(job);
@@ -53,6 +58,7 @@ public class JobService {
                 .map(job -> {
                     JobResponse jobResponse = ObjectUtil.copyProperties(job, new JobResponse(), JobResponse.class, true);
                     jobResponse.setKeywords(this.extractKeyword(job.getKeywords()));
+                    jobResponse.setRecruiters(this.extractKeyword(job.getRecruiters()));
                     return jobResponse;
                 }).collect(Collectors.toList());
 
@@ -87,15 +93,16 @@ public class JobService {
                 .orElseThrow(() -> ApiException.create(HttpStatus.BAD_REQUEST).withMessage("Không tìm thấy job:" + id));
         JobDetailResponse jobResponse = ObjectUtil.copyProperties(hiringJob, new JobDetailResponse(), JobDetailResponse.class, true);
         jobResponse.setKeywords(this.extractKeyword(hiringJob.getKeywords()));
+        jobResponse.setRecruiters(this.extractKeyword(hiringJob.getRecruiters()));
         return jobResponse;
     }
 
 
-    private List<String> extractKeyword(String keyword) {
+    private Set<String> extractKeyword(String keyword) {
         if (keyword == null || keyword.isEmpty()) {
-            return Collections.emptyList();
+            return new HashSet<>();
         }
-        return Arrays.asList(keyword.split("-"));
+        return Set.of(keyword.split("-"));
     }
 
     public JobResponse changeJobStatus(Long id, boolean status) {
@@ -114,7 +121,6 @@ public class JobService {
         updatedJob.setEndDate(updateJobRequest.getEndDate());
         updatedJob.setDescription(updateJobRequest.getDescription());
         updatedJob.setTitle(updateJobRequest.getTitle());
-        updatedJob.setPosition(updateJobRequest.getPosition());
         updatedJob.setTargetNumber(updateJobRequest.getTargetNumber());
         updatedJob.setSalaryRangeTo(updateJobRequest.getSalaryRangeTo());
         updatedJob.setSalaryRangeFrom(updateJobRequest.getSalaryRangeFrom());

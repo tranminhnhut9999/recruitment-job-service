@@ -8,7 +8,9 @@ import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class CreateJobRequest {
@@ -30,11 +32,16 @@ public class CreateJobRequest {
     @NotNull
     @NotEmpty
     private BigDecimal salaryRangeTo = BigDecimal.ZERO;
-    private List<String> keywords = new ArrayList<>();
+    private Set<String> keywords = new HashSet<>();
     private Instant endDate;
+    private Instant startDate;
     @NotNull
     @NotEmpty
     private String position;
     private boolean status = false;
     private Float requiredExperience = 0.0F;
+    @NotNull
+    private Set<String> recruiters = new HashSet<>();
+    private String jobType = "";
+    private String workingPlace = "";
 }

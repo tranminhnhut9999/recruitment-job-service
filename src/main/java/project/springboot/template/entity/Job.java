@@ -7,8 +7,13 @@ import lombok.*;
 import project.springboot.template.entity.common.BaseEntity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -25,12 +30,15 @@ public class Job extends BaseEntity {
     private String title;
     @Lob
     private String description;
-    private Integer targetNumber = 0;
+    private Integer targetNumber = 1;
     private BigDecimal salaryRangeFrom = BigDecimal.ZERO;
     private BigDecimal salaryRangeTo = BigDecimal.ZERO;
     private String keywords = "";
     private Instant endDate;
-    private String position;
+    private Instant startDate;
     private boolean status = false;
     private Float requiredExperience = 0.0F;
+    private String recruiters;
+    private String jobType = "";
+    private String workingPlace = "";
 }
