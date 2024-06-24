@@ -27,7 +27,7 @@ public class JobController {
     }
 
     // Get Hiring Detail Job
-    @GetMapping("/{id}/hiring")
+    @GetMapping("/hiring/{id}")
     public ResponseEntity<ApiResponse<JobDetailResponse>> getHiringJobDetail(@PathVariable("id") Long id) {
         return ResponseEntity.ok(ApiResponse.success(this.jobService.getHiringDetailJob(id)));
     }

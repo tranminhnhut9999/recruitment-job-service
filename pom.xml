@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>project.springboot</groupId>
-    <artifactId>template</artifactId>
+    <artifactId>jobs-ervice</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Spring Boot Template Project</name>
+    <name>Job Service</name>
     <description>Spring Boot Template Project</description>
     <properties>
         <java.version>11</java.version>

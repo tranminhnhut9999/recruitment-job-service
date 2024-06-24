@@ -1,5 +1,6 @@
 package project.springboot.template.config.security.jwt;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,14 +18,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final HttpService httpService;
+
+    private static final List<String> escapeURLs =
+            new ArrayList<>(Arrays.asList("/api/jobs/hiring", "api-docs/swagger-config", "api-docs", "swagger-ui"));
+
 
     public JwtFilter(JwtUtil jwtUtil, HttpService httpService) {
         this.jwtUtil = jwtUtil;
@@ -35,21 +39,8 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
-        if ("/api/jobs/hiring".equals(requestURI)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        // config for swagger
-        if (requestURI.contains("api-docs/swagger-config")
-                || requestURI.contains("api-docs")
-                || requestURI.contains("swagger-ui")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        String method = request.getMethod();
-        // page content
-        if (requestURI.contains("/api/page-content/code") && request.getMethod().equals(HttpMethod.GET.name())) {
+        long count = this.escapeURLs.stream().filter(url -> url.contains(requestURI) || requestURI.contains(url)).count();
+        if (count > 0) {
             filterChain.doFilter(request, response);
             return;
         }

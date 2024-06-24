@@ -44,4 +44,5 @@ public class CreateJobRequest {
     private Set<String> recruiters = new HashSet<>();
     private String jobType = "";
     private String workingPlace = "";
+    private String requiredGender = "Không yêu cầu";
 }
